@@ -7,17 +7,14 @@ A Visual Studio Code extension that copies the content of all open tabs to the c
 - Copy all open tabs in Visual Studio Code with a single command.
 - Preserve the file structure and order of the tabs when copying.
 - Include relative filenames along with the content of each file.
-- Supports copying tabs across multiple windows and workspaces.
 
 ## Installation
 
-1. Download the latest `.vsix` file from the [releases page](https://github.com/0xfloyd/copy-all-tabs/releases).
+Download/use the latest `copy-all-tabs-<version>.vsix` file, or build it yourself locally.
 
-2. Open Visual Studio Code.
-3. Go to the Extensions view by clicking on the square icon on the left sidebar or by pressing `Ctrl+Shift+X`.
-4. Click on the "..." menu in the top-right corner of the Extensions view.
-5. Select "Install from VSIX..." and choose the downloaded `.vsix` file.
-6. Once installed, you can find the extension in the Extensions view under the "Installed" tab.
+1. Open Visual Studio Code.
+2. Right click on the `***.vsix` file and select "Install Extension VSIX".
+3. Once installed, you can find the extension in the Extensions view under the "Installed" tab.
 
 ## Usage
 
