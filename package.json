@@ -1,0 +1,56 @@
+{
+  "name": "copy-all-tabs",
+  "displayName": "copy-all-tabs",
+  "description": "copies content of all open tabs in cursor/vscode",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/your-repository"
+  },
+  "activationEvents": [
+    "onCommand:copy-all-tabs.copyAllTabs"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "copy-all-tabs.copyAllTabs",
+        "title": "Copy All Tabs Content"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "copy-all-tabs.copyAllTabs",
+        "key": "ctrl+alt+shift+x",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "main": "./dist/extension.js",
+  "scripts": {
+    "vscode:prepublish": "webpack --mode production",
+    "compile": "webpack --mode production",
+    "watch": "webpack --watch --mode development",
+    "test-compile": "tsc -p ./",
+    "dev": "webpack --mode development"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.87.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
