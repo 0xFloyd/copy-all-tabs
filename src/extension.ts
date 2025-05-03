@@ -1,41 +1,66 @@
+// src/extension.ts
 import * as vscode from 'vscode'
 
-function activate(context: vscode.ExtensionContext) {
-  vscode.window.showInformationMessage('extension activated')
-
-  let disposable = vscode.commands.registerCommand('copy-all-tabs.copyAllTabs', async () => {
+export function activate(context: vscode.ExtensionContext) {
+  const copyCommand = vscode.commands.registerCommand('copy-all-tabs.copyAllTabs', async () => {
     try {
-      const openDocuments = vscode.workspace.textDocuments
-
-      if (openDocuments.length === 0) {
-        vscode.window.showInformationMessage('No open documents found')
-        return
+      const docs = collectDocumentsFromOpenTabs()
+      if (docs.length === 0) {
+        return vscode.window.showInformationMessage('No open tabs found.')
       }
 
-      let contentToCopy = ''
+      const chunks = docs.map((doc) => {
+        const rel = vscode.workspace.asRelativePath(doc.uri)
+        return `\n${rel}\n${doc.getText()}`
+      })
 
-      for (const document of openDocuments) {
-        const relativePath = vscode.workspace.asRelativePath(document.uri)
-        const content = document.getText()
-        contentToCopy += `\n${relativePath}\n${content}\n`
-      }
-
-      await vscode.env.clipboard.writeText(contentToCopy.trim())
-      vscode.window.showInformationMessage('All open tabs have been copied to the clipboard.')
-    } catch (error) {
-      console.error('Error copying tabs:', error)
-      vscode.window.showErrorMessage(`Failed to copy tabs: ${error instanceof Error ? error.message : String(error)}`)
+      await vscode.env.clipboard.writeText(chunks.join('\n').trim())
+      vscode.window.showInformationMessage(`Copied ${docs.length} tab${docs.length > 1 ? 's' : ''} to clipboard.`)
+    } catch (err: unknown) {
+      console.error(err)
+      vscode.window.showErrorMessage(`Failed to copy tabs: ${(err as Error).message}`)
     }
   })
 
-  context.subscriptions.push(disposable)
+  context.subscriptions.push(copyCommand)
 }
 
+/**
+ * Returns TextDocuments that correspond **only** to tabs currently shown in
+ * the focused window’s tab bar (no hidden previews, no closed docs, no other
+ * VS Code windows).
+ */
+function collectDocumentsFromOpenTabs(): vscode.TextDocument[] {
+  const results: vscode.TextDocument[] = []
+  const seen = new Set<string>()
 
-
-function deactivate() {}
-
-module.exports = {
-  activate,
-  deactivate
+  for (const group of vscode.window.tabGroups.all) {
+    for (const tab of group.tabs) {
+      // Tab must be text (skip images, binaries, terminals, notebooks, etc.)
+      if (tab.input instanceof vscode.TabInputText) {
+        const uri = tab.input.uri
+        if (!seen.has(uri.toString())) {
+          const doc = vscode.workspace.textDocuments.find((d) => d.uri.toString() === uri.toString())
+          if (doc) {
+            results.push(doc)
+            seen.add(uri.toString())
+          }
+        }
+      } else if (tab.input instanceof vscode.TabInputTextDiff) {
+        // Diff tabs hold two URIs (modified & original)
+        for (const uri of [tab.input.modified, tab.input.original]) {
+          if (!seen.has(uri.toString())) {
+            const doc = vscode.workspace.textDocuments.find((d) => d.uri.toString() === uri.toString())
+            if (doc) {
+              results.push(doc)
+              seen.add(uri.toString())
+            }
+          }
+        }
+      }
+    }
+  }
+  return results
 }
+
+export function deactivate() {}
